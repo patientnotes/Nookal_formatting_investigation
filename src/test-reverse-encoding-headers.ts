@@ -16,8 +16,9 @@ async function testReverseEncodingWithHeaders() {
   loadEnvFile();
   const client = createNookalClientFromEnv();
 
-  // Function to convert UTF-8 to Latin-1 bytes
+  // Function to convert UTF-8 to Latin-1 bytes (reverse of corruption)
   function utf8ToLatin1(text: string): string {
+    // Convert UTF-8 string to bytes, then interpret as Latin-1
     const utf8Bytes = new TextEncoder().encode(text);
     let latin1 = "";
     for (let i = 0; i < utf8Bytes.length; i++) {

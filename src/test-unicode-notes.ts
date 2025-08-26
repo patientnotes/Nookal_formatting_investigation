@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { createNookalClientFromEnv } from "./nookal-client.js";
-import { loadEnvFile, formatDateTime } from "./utils.js";
+import { createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, formatDateTime } from "./utils";
 
 /**
  * Test script to verify unicode/UTF-8 character handling in treatment notes.

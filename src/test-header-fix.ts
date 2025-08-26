@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { createNookalClientFromEnv } from "./nookal-client.js";
-import { loadEnvFile, formatDateTime } from "./utils.js";
+import { createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, formatDateTime } from "./utils";
 
 /**
  * Test script to verify if UTF-8 charset headers fix unicode corruption
@@ -39,7 +39,7 @@ async function testHeaderFix() {
       name: "Bullet Points",
       text: "Treatment:\n• Pain relief\n• Exercise",
       expected: "Treatment:\n• Pain relief\n• Exercise",
-    }
+    },
   ];
 
   try {
@@ -51,7 +51,9 @@ async function testHeaderFix() {
     }
 
     const patientId = parseInt(patients[0].ID);
-    console.log(`✅ Using patient: ${patients[0].FirstName} ${patients[0].LastName} (ID: ${patientId})`);
+    console.log(
+      `✅ Using patient: ${patients[0].FirstName} ${patients[0].LastName} (ID: ${patientId})`,
+    );
 
     const cases = await client.getCases({ patientID: patientId.toString() });
     if (cases.length === 0) {
@@ -69,7 +71,9 @@ async function testHeaderFix() {
     }
 
     const practitionerId = parseInt(practitioners[0].ID);
-    console.log(`✅ Using practitioner: ${practitioners[0].FirstName} ${practitioners[0].LastName} (ID: ${practitionerId})\n`);
+    console.log(
+      `✅ Using practitioner: ${practitioners[0].FirstName} ${practitioners[0].LastName} (ID: ${practitionerId})\n`,
+    );
 
     let successCount = 0;
     let failCount = 0;
@@ -97,17 +101,24 @@ async function testHeaderFix() {
         console.log(`   ✅ Note added successfully`);
 
         // Wait for processing
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // Get all notes to find our test note
         const allNotes = await client.getAllTreatmentNotes({ page_length: 50 });
 
         // Find our note (look in answers array based on previous discoveries)
-        const ourNote = allNotes.find(note => {
+        const ourNote = allNotes.find((note) => {
           if (note.answers && Array.isArray(note.answers)) {
             const firstAnswer = note.answers[0];
-            if (firstAnswer && firstAnswer.answers && Array.isArray(firstAnswer.answers)) {
-              return firstAnswer.answers[0] && firstAnswer.answers[0].includes(`[HEADER TEST ${i + 1}]`);
+            if (
+              firstAnswer &&
+              firstAnswer.answers &&
+              Array.isArray(firstAnswer.answers)
+            ) {
+              return (
+                firstAnswer.answers[0] &&
+                firstAnswer.answers[0].includes(`[HEADER TEST ${i + 1}]`)
+              );
             }
           }
           return false;
@@ -127,7 +138,9 @@ async function testHeaderFix() {
 
             // Analyze corruption
             if (retrievedText.includes("Ã")) {
-              console.log(`   🔍 Corruption type: UTF-8 → Latin-1 → UTF-8 double encoding`);
+              console.log(
+                `   🔍 Corruption type: UTF-8 → Latin-1 → UTF-8 double encoding`,
+              );
             } else if (retrievedText.includes("Â")) {
               console.log(`   🔍 Corruption type: Latin-1/UTF-8 confusion`);
             } else if (retrievedText.includes("â€")) {
@@ -142,9 +155,10 @@ async function testHeaderFix() {
           console.log(`   ❌ Note not found after adding`);
           failCount++;
         }
-
       } catch (error) {
-        console.log(`   ❌ Error: ${error instanceof Error ? error.message : error}`);
+        console.log(
+          `   ❌ Error: ${error instanceof Error ? error.message : error}`,
+        );
         failCount++;
       }
 
@@ -156,21 +170,32 @@ async function testHeaderFix() {
     console.log("═══════════════════════════");
     console.log(`✅ Success: ${successCount}/${testCases.length}`);
     console.log(`❌ Failed: ${failCount}/${testCases.length}`);
-    console.log(`📈 Success Rate: ${Math.round((successCount / testCases.length) * 100)}%\n`);
+    console.log(
+      `📈 Success Rate: ${Math.round((successCount / testCases.length) * 100)}%\n`,
+    );
 
     if (successCount === testCases.length) {
-      console.log("🎉 EXCELLENT! UTF-8 headers completely fixed the unicode corruption issue!");
+      console.log(
+        "🎉 EXCELLENT! UTF-8 headers completely fixed the unicode corruption issue!",
+      );
       console.log("🛠️  The fix was:");
-      console.log('   • Content-Type: "application/x-www-form-urlencoded; charset=utf-8"');
+      console.log(
+        '   • Content-Type: "application/x-www-form-urlencoded; charset=utf-8"',
+      );
       console.log('   • Accept: "application/json; charset=utf-8"');
     } else if (successCount > 0) {
-      console.log("🤔 PARTIAL SUCCESS: UTF-8 headers improved but didn't completely fix the issue.");
-      console.log("   Additional measures may be needed for full unicode support.");
+      console.log(
+        "🤔 PARTIAL SUCCESS: UTF-8 headers improved but didn't completely fix the issue.",
+      );
+      console.log(
+        "   Additional measures may be needed for full unicode support.",
+      );
     } else {
-      console.log("😞 NO IMPROVEMENT: UTF-8 headers alone didn't fix the unicode corruption.");
+      console.log(
+        "😞 NO IMPROVEMENT: UTF-8 headers alone didn't fix the unicode corruption.",
+      );
       console.log("   Server-side configuration changes may be required.");
     }
-
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

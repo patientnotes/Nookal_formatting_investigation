@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { createNookalClientFromEnv } from "./nookal-client.js";
-import { loadEnvFile, formatDateTime } from "./utils.js";
+import { createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, formatDateTime } from "./utils";
 
 /**
  * Simple test to verify our updated headers implementation works
@@ -9,7 +9,9 @@ import { loadEnvFile, formatDateTime } from "./utils.js";
 
 async function testUpdatedHeaders() {
   console.log("🧪 Testing Updated Headers Implementation\n");
-  console.log("Verifying that our exact PHP SDK header matching works for basic cases\n");
+  console.log(
+    "Verifying that our exact PHP SDK header matching works for basic cases\n",
+  );
 
   loadEnvFile();
   const client = createNookalClientFromEnv();
@@ -25,9 +27,13 @@ async function testUpdatedHeaders() {
     const practitioners = await client.getPractitioners();
     const practitionerId = parseInt(practitioners[0].ID);
 
-    console.log(`✅ Using patient: ${patients[0].FirstName} ${patients[0].LastName} (ID: ${patientId})`);
+    console.log(
+      `✅ Using patient: ${patients[0].FirstName} ${patients[0].LastName} (ID: ${patientId})`,
+    );
     console.log(`✅ Using case: ${cases[0].caseTitle} (ID: ${caseId})`);
-    console.log(`✅ Using practitioner: ${practitioners[0].FirstName} ${practitioners[0].LastName} (ID: ${practitionerId})\n`);
+    console.log(
+      `✅ Using practitioner: ${practitioners[0].FirstName} ${practitioners[0].LastName} (ID: ${practitionerId})\n`,
+    );
 
     // Test simple ASCII text first
     const asciiTest = "Simple ASCII test - no special characters";
@@ -47,11 +53,11 @@ async function testUpdatedHeaders() {
       console.log(`   📋 Result: ${JSON.stringify(asciiResult)}`);
 
       // Wait and verify
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const notes = await client.getAllTreatmentNotes({ page_length: 10 });
-      const foundNote = notes.find(note =>
-        note.answers?.[0]?.answers?.[0]?.includes("[HEADER UPDATE TEST]")
+      const foundNote = notes.find((note) =>
+        note.answers?.[0]?.answers?.[0]?.includes("[HEADER UPDATE TEST]"),
       );
 
       if (foundNote) {
@@ -60,10 +66,13 @@ async function testUpdatedHeaders() {
       } else {
         console.log(`   ❌ ASCII note not found in recent notes`);
       }
-
     } catch (error) {
-      console.log(`   ❌ ASCII test failed: ${error instanceof Error ? error.message : error}`);
-      console.log(`   🔍 This suggests our header update may have broken basic functionality`);
+      console.log(
+        `   ❌ ASCII test failed: ${error instanceof Error ? error.message : error}`,
+      );
+      console.log(
+        `   🔍 This suggests our header update may have broken basic functionality`,
+      );
       return;
     }
 
@@ -86,11 +95,11 @@ async function testUpdatedHeaders() {
       console.log(`   ✅ Smart quote note added successfully`);
       console.log(`   📋 Result: ${JSON.stringify(quoteResult)}`);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const notes2 = await client.getAllTreatmentNotes({ page_length: 15 });
-      const foundNote2 = notes2.find(note =>
-        note.answers?.[0]?.answers?.[0]?.includes("[SMART QUOTE TEST]")
+      const foundNote2 = notes2.find((note) =>
+        note.answers?.[0]?.answers?.[0]?.includes("[SMART QUOTE TEST]"),
       );
 
       if (foundNote2) {
@@ -110,9 +119,10 @@ async function testUpdatedHeaders() {
       } else {
         console.log(`   ❌ Smart quote note not found in recent notes`);
       }
-
     } catch (error) {
-      console.log(`   ❌ Smart quote test failed: ${error instanceof Error ? error.message : error}`);
+      console.log(
+        `   ❌ Smart quote test failed: ${error instanceof Error ? error.message : error}`,
+      );
     }
 
     console.log("");
@@ -134,11 +144,11 @@ async function testUpdatedHeaders() {
       console.log(`   ✅ Unicode note added successfully`);
       console.log(`   📋 Result: ${JSON.stringify(unicodeResult)}`);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const notes3 = await client.getAllTreatmentNotes({ page_length: 20 });
-      const foundNote3 = notes3.find(note =>
-        note.answers?.[0]?.answers?.[0]?.includes("[UNICODE TEST]")
+      const foundNote3 = notes3.find((note) =>
+        note.answers?.[0]?.answers?.[0]?.includes("[UNICODE TEST]"),
       );
 
       if (foundNote3) {
@@ -149,34 +159,46 @@ async function testUpdatedHeaders() {
         console.log(`   📄 Retrieved: "${noteContent}"`);
 
         if (noteContent === unicodeTest) {
-          console.log(`   🎉 INCREDIBLE! All unicode characters preserved exactly`);
+          console.log(
+            `   🎉 INCREDIBLE! All unicode characters preserved exactly`,
+          );
         } else if (noteContent.includes("Ã") || noteContent.includes("Â")) {
-          console.log(`   ❌ Classic UTF-8 double-encoding corruption detected`);
+          console.log(
+            `   ❌ Classic UTF-8 double-encoding corruption detected`,
+          );
           console.log(`   Expected: "${unicodeTest}"`);
           console.log(`   Got: "${noteContent}"`);
         } else {
-          console.log(`   🤔 Unicode characters changed but not classic corruption`);
+          console.log(
+            `   🤔 Unicode characters changed but not classic corruption`,
+          );
           console.log(`   Expected: "${unicodeTest}"`);
           console.log(`   Got: "${noteContent}"`);
         }
       } else {
         console.log(`   ❌ Unicode note not found in recent notes`);
       }
-
     } catch (error) {
-      console.log(`   ❌ Unicode test failed: ${error instanceof Error ? error.message : error}`);
+      console.log(
+        `   ❌ Unicode test failed: ${error instanceof Error ? error.message : error}`,
+      );
     }
 
     console.log("\n📊 UPDATED HEADERS TEST SUMMARY");
     console.log("═══════════════════════════════");
     console.log("✅ Headers now match PHP SDK exactly:");
-    console.log("   • Content-Type: application/x-www-form-urlencoded; charset=UTF-8");
+    console.log(
+      "   • Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
+    );
     console.log("   • Content-Length: [calculated]");
     console.log("   • User-Agent: Nookal-Client/1.0.0");
     console.log("");
-    console.log("🔍 This test verifies our implementation works before running");
-    console.log("   more complex unicode tests that might fail due to server issues.");
-
+    console.log(
+      "🔍 This test verifies our implementation works before running",
+    );
+    console.log(
+      "   more complex unicode tests that might fail due to server issues.",
+    );
   } catch (error) {
     console.error("❌ Test setup failed:", error);
   }

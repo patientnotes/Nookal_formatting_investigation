@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { createNookalClientFromEnv } from "./nookal-client.js";
-import { loadEnvFile, formatDateTime } from "./utils.js";
+import { createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, formatDateTime } from "./utils";
 
 /**
  * Test script with simple, minimal images similar to what Nookal actually uses
@@ -16,9 +16,12 @@ async function testSimpleImages() {
 
   // Much simpler image data - based on what we saw from Nookal
   const simpleImages = {
-    degree: 'data:image/gif;base64,R0lGODdhDwAPAPEAAKKoqu7v8FpkaP///ywAAAAADwAPAAACK5yPqcsp7aCYUz1zVQAChPEEHQJ4Jcidh/CJk4cCRrnJJGts3Qf1/g9kFAAAOw==',
-    bullet: 'data:image/gif;base64,R0lGODdhDwAPAPIHAJCWmc7R0rq/wP///3B5fP7+/lpkaObo6CwAAAAADwAPAAADRDi63F1BiONWIAQATBkkQaEUAtENB2EIjgBYxuoU5qidDBBUjs57tUFBs9ktXAxBjCASlnA0A0aTwSlchYPEusj+vo4EADs=',
-    plusminus: 'data:image/gif;base64,R0lGODdhCwAPAPEAANjb3KWqrFpkaP///ywAAAAACwAPAAACJZyPqSYtoYQBAiRpAkSYWu5s3OBlXydpBzYEzUI+iydfVgnnSQEAOw=='
+    degree:
+      "data:image/gif;base64,R0lGODdhDwAPAPEAAKKoqu7v8FpkaP///ywAAAAADwAPAAACK5yPqcsp7aCYUz1zVQAChPEEHQJ4Jcidh/CJk4cCRrnJJGts3Qf1/g9kFAAAOw==",
+    bullet:
+      "data:image/gif;base64,R0lGODdhDwAPAPIHAJCWmc7R0rq/wP///3B5fP7+/lpkaObo6CwAAAAADwAPAAADRDi63F1BiONWIAQATBkkQaEUAtENB2EIjgBYxuoU5qidDBBUjs57tUFBs9ktXAxBjCASlnA0A0aTwSlchYPEusj+vo4EADs=",
+    plusminus:
+      "data:image/gif;base64,R0lGODdhCwAPAPEAANjb3KWqrFpkaP///ywAAAAACwAPAAACJZyPqSYtoYQBAiRpAkSYWu5s3OBlXydpBzYEzUI+iydfVgnnSQEAOw==",
   };
 
   // Test cases with simple replacements
@@ -27,32 +30,32 @@ async function testSimpleImages() {
       name: "Simple Degree Symbol",
       original: "Temperature: 98.6°F",
       withImages: `Temperature: 98.6<img src="${simpleImages.degree}" alt="degree" />F`,
-      description: "Replace degree with minimal GIF"
+      description: "Replace degree with minimal GIF",
     },
     {
       name: "Simple Bullet Point",
       original: "Treatment: • Rest",
       withImages: `Treatment: <img src="${simpleImages.bullet}" alt="bullet" /> Rest`,
-      description: "Replace bullet with minimal GIF"
+      description: "Replace bullet with minimal GIF",
     },
     {
       name: "Simple Plus-Minus",
       original: "BP: 120 ± 5 mmHg",
       withImages: `BP: 120 <img src="${simpleImages.plusminus}" alt="plusminus" /> 5 mmHg`,
-      description: "Replace ± with minimal GIF"
+      description: "Replace ± with minimal GIF",
     },
     {
       name: "Text Only Test",
       original: "No special characters here",
       withImages: "No special characters here",
-      description: "Control test with no images"
+      description: "Control test with no images",
     },
     {
       name: "Mixed Content",
       original: "Patient: café visit, temp 98.6°",
       withImages: `Patient: cafe visit, temp 98.6<img src="${simpleImages.degree}" alt="degree" />`,
-      description: "Mix of substitution and images"
-    }
+      description: "Mix of substitution and images",
+    },
   ];
 
   try {
@@ -66,9 +69,13 @@ async function testSimpleImages() {
     const practitioners = await client.getPractitioners();
     const practitionerId = parseInt(practitioners[0].ID);
 
-    console.log(`✅ Using patient: ${patients[0].FirstName} ${patients[0].LastName} (ID: ${patientId})`);
+    console.log(
+      `✅ Using patient: ${patients[0].FirstName} ${patients[0].LastName} (ID: ${patientId})`,
+    );
     console.log(`✅ Using case: ${cases[0].caseTitle} (ID: ${caseId})`);
-    console.log(`✅ Using practitioner: ${practitioners[0].FirstName} ${practitioners[0].LastName} (ID: ${practitionerId})\n`);
+    console.log(
+      `✅ Using practitioner: ${practitioners[0].FirstName} ${practitioners[0].LastName} (ID: ${practitionerId})\n`,
+    );
 
     let successCount = 0;
     let failCount = 0;
@@ -95,15 +102,22 @@ async function testSimpleImages() {
         });
 
         console.log(`   ✅ Note added successfully`);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Get recent notes
         const allNotes = await client.getAllTreatmentNotes({ page_length: 30 });
-        const ourNote = allNotes.find(note => {
+        const ourNote = allNotes.find((note) => {
           if (note.answers && Array.isArray(note.answers)) {
             const firstAnswer = note.answers[0];
-            if (firstAnswer && firstAnswer.answers && Array.isArray(firstAnswer.answers)) {
-              return firstAnswer.answers[0] && firstAnswer.answers[0].includes(`[SIMPLE IMG ${i + 1}]`);
+            if (
+              firstAnswer &&
+              firstAnswer.answers &&
+              Array.isArray(firstAnswer.answers)
+            ) {
+              return (
+                firstAnswer.answers[0] &&
+                firstAnswer.answers[0].includes(`[SIMPLE IMG ${i + 1}]`)
+              );
             }
           }
           return false;
@@ -113,7 +127,10 @@ async function testSimpleImages() {
           const retrievedText = ourNote.answers[0].answers[0];
           console.log(`   Retrieved: "${retrievedText}"`);
 
-          const noteContent = retrievedText.replace(`[SIMPLE IMG ${i + 1}] `, '');
+          const noteContent = retrievedText.replace(
+            `[SIMPLE IMG ${i + 1}] `,
+            "",
+          );
 
           if (noteContent.includes('<img src="data:image/')) {
             console.log(`   🎉 SUCCESS! Images preserved in Nookal!`);
@@ -131,9 +148,10 @@ async function testSimpleImages() {
           console.log(`   ❌ Note not found after adding`);
           failCount++;
         }
-
       } catch (error) {
-        console.log(`   ❌ Error: ${error instanceof Error ? error.message : error}`);
+        console.log(
+          `   ❌ Error: ${error instanceof Error ? error.message : error}`,
+        );
         failCount++;
       }
 
@@ -145,11 +163,15 @@ async function testSimpleImages() {
     console.log("════════════════════════════");
     console.log(`✅ Success: ${successCount}/${testCases.length}`);
     console.log(`❌ Failed: ${failCount}/${testCases.length}`);
-    console.log(`📈 Success Rate: ${Math.round((successCount / testCases.length) * 100)}%\n`);
+    console.log(
+      `📈 Success Rate: ${Math.round((successCount / testCases.length) * 100)}%\n`,
+    );
 
     if (successCount === testCases.length) {
       console.log("🎉 EXCELLENT! Simple images work perfectly!");
-      console.log("💡 Recommendation: Use minimal GIF images for unicode characters");
+      console.log(
+        "💡 Recommendation: Use minimal GIF images for unicode characters",
+      );
       console.log("   • Copy Nookal's existing image format");
       console.log("   • Create library of common character images");
       console.log("   • Fallback to text substitution for unsupported chars");
@@ -160,7 +182,6 @@ async function testSimpleImages() {
       console.log("😞 Simple images still don't work");
       console.log("💡 Next: Analyze exact format of Nookal's working images");
     }
-
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

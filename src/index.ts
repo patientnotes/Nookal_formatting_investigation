@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { NookalClient, createNookalClientFromEnv } from "./nookal-client.js";
-import { loadEnvFile, prettyPrint, getDateRange, formatDate } from "./utils.js";
+import { NookalClient, createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, prettyPrint, getDateRange, formatDate } from "./utils";
 
 /**
  * Example usage of the Nookal API client

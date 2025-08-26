@@ -1,6 +1,6 @@
 // Main library exports for the Nookal API Client
 
-export { NookalClient, createNookalClientFromEnv } from "./nookal-client.js";
+export { NookalClient, createNookalClientFromEnv } from "./nookal-client";
 export type {
   AddTreatmentNoteParams,
   Appointment,
@@ -28,4 +28,4 @@ export {
   retry,
   sanitiseForLogging,
   sleep,
-} from "./utils.js";
+} from "./utils";

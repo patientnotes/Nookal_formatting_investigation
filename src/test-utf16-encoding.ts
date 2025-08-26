@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { createNookalClientFromEnv } from "./nookal-client.js";
-import { loadEnvFile, formatDateTime } from "./utils.js";
+import { createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, formatDateTime } from "./utils";
 
 /**
  * Test script to verify UTF-16 encoding approach for unicode characters
@@ -23,8 +23,8 @@ async function testUtf16Encoding() {
     for (let i = 0; i < text.length; i++) {
       const code = text.charCodeAt(i);
       // UTF-16 little-endian encoding
-      utf16Bytes.push(code & 0xFF);        // low byte
-      utf16Bytes.push((code >> 8) & 0xFF); // high byte
+      utf16Bytes.push(code & 0xff); // low byte
+      utf16Bytes.push((code >> 8) & 0xff); // high byte
     }
     return String.fromCharCode(...utf16Bytes);
   }
@@ -56,41 +56,41 @@ async function testUtf16Encoding() {
       original: "Café visit with Dr. José",
       encoded: textToUtf16("Café visit with Dr. José"),
       description: "Convert to UTF-16 bytes as string",
-      approach: "binary"
+      approach: "binary",
     },
     {
       name: "UTF-16 Hex Escapes",
       original: "Temperature: 98.6°F",
       encoded: textToUtf16Hex("Temperature: 98.6°F"),
       description: "Use \\uXXXX hex escape sequences",
-      approach: "hex"
+      approach: "hex",
     },
     {
       name: "UTF-16 Base64",
       original: "BP: 120/80 ± 5 mmHg",
       encoded: `<utf16>${textToUtf16Base64("BP: 120/80 ± 5 mmHg")}</utf16>`,
       description: "Base64 encoded UTF-16 with wrapper tags",
-      approach: "base64"
+      approach: "base64",
     },
     {
       name: "Unicode Escape Sequences",
       original: 'Patient said "I feel better"',
-      encoded: 'Patient said \\u201cI feel better\\u201d',
+      encoded: "Patient said \\u201cI feel better\\u201d",
       description: "Use JavaScript-style unicode escapes",
-      approach: "escape"
+      approach: "escape",
     },
     {
       name: "Mixed UTF-16 Approach",
       original: "François: 45° ± 2, O₂ 98%",
       encoded: `Fran\\u00e7ois: 45\\u00b0 \\u00b1 2, O\\u2082 98%`,
       description: "Mix ASCII and UTF-16 escapes",
-      approach: "mixed"
-    }
+      approach: "mixed",
+    },
   ];
 
   // Create a modified client that sends UTF-16 headers
   const originalMakeRequest = (client as any).makeRequest.bind(client);
-  (client as any).makeRequest = async function<T>(
+  (client as any).makeRequest = async function <T>(
     endpoint: string,
     params?: any,
     options: any = {},
@@ -103,7 +103,7 @@ async function testUtf16Encoding() {
         ...options,
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=utf-16le",
-          "Accept": "application/json; charset=utf-8",
+          Accept: "application/json; charset=utf-8",
           "User-Agent": "Nookal-Client/1.0.0",
         },
       };
@@ -161,7 +161,9 @@ async function testUtf16Encoding() {
       console.log(`   Description: ${testCase.description}`);
       console.log(`   Approach: ${testCase.approach}`);
       console.log(`   Original: "${testCase.original}"`);
-      console.log(`   UTF-16 Encoded: "${testCase.encoded.substring(0, 50)}${testCase.encoded.length > 50 ? '...' : ''}"`);
+      console.log(
+        `   UTF-16 Encoded: "${testCase.encoded.substring(0, 50)}${testCase.encoded.length > 50 ? "..." : ""}"`,
+      );
 
       try {
         // Add the note with UTF-16 encoding
@@ -266,8 +268,12 @@ async function testUtf16Encoding() {
     // Summary
     console.log("📊 UTF-16 ENCODING TEST SUMMARY");
     console.log("═══════════════════════════════");
-    console.log(`🎉 Perfect (UTF-16 → unicode): ${successCount}/${testCases.length}`);
-    console.log(`✅ Good (UTF-16 preserved): ${partialCount}/${testCases.length}`);
+    console.log(
+      `🎉 Perfect (UTF-16 → unicode): ${successCount}/${testCases.length}`,
+    );
+    console.log(
+      `✅ Good (UTF-16 preserved): ${partialCount}/${testCases.length}`,
+    );
     console.log(`❌ Failed: ${failCount}/${testCases.length}`);
     const totalSuccess = successCount + partialCount;
     console.log(
@@ -284,10 +290,14 @@ async function testUtf16Encoding() {
       console.log("   3. Nookal processes UTF-16 correctly!");
 
       console.log("\n💻 Implementation:");
-      console.log("   Headers: 'Content-Type: application/x-www-form-urlencoded; charset=utf-16le'");
+      console.log(
+        "   Headers: 'Content-Type: application/x-www-form-urlencoded; charset=utf-16le'",
+      );
       console.log("   function encodeForNookal(text: string): string {");
       console.log("     return text.replace(/[^\\x00-\\x7F]/g, char =>");
-      console.log("       '\\\\u' + char.charCodeAt(0).toString(16).padStart(4, '0')");
+      console.log(
+        "       '\\\\u' + char.charCodeAt(0).toString(16).padStart(4, '0')",
+      );
       console.log("     );");
       console.log("   }");
     } else if (totalSuccess === testCases.length) {
@@ -358,9 +368,13 @@ async function testUtf16Encoding() {
         console.log(`   Retrieved: "${noteContent2}"`);
 
         if (noteContent2 === bonusTest.original) {
-          console.log(`   🎉 PERFECT! UTF-16 content with UTF-8 headers worked!`);
+          console.log(
+            `   🎉 PERFECT! UTF-16 content with UTF-8 headers worked!`,
+          );
         } else if (noteContent2 === bonusTest.encoded) {
-          console.log(`   ✅ GOOD! UTF-16 encoding preserved with UTF-8 headers`);
+          console.log(
+            `   ✅ GOOD! UTF-16 encoding preserved with UTF-8 headers`,
+          );
         } else {
           console.log(`   ❌ Still issues with UTF-16 content + UTF-8 headers`);
         }
@@ -370,7 +384,6 @@ async function testUtf16Encoding() {
     } catch (error) {
       console.log(`   ❌ Error with UTF-16 content: ${error}`);
     }
-
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

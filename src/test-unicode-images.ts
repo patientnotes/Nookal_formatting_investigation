@@ -1,129 +1,95 @@
 #!/usr/bin/env node
 
-import { createNookalClientFromEnv } from "./nookal-client.js";
-import { loadEnvFile, formatDateTime } from "./utils.js";
+import { createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, formatDateTime } from "./utils";
 
 /**
- * Test script to convert unicode characters to base64 images like Nookal does
+ * Test script using Nookal's exact image format with proper alt text patterns
  */
 
-async function testUnicodeImages() {
-  console.log("🧪 Testing Unicode-to-Image Conversion Strategy\n");
+async function testNookalStyleImages() {
+  console.log("🧪 Testing Nookal-Style Images with Proper Alt Text\n");
   console.log(
-    "Theory: Convert unicode characters to base64 images like Nookal's symbol panel\n",
+    "Theory: Alt text must match a substring of the base64 image data\n",
   );
 
   loadEnvFile();
   const client = createNookalClientFromEnv();
 
-  // Function to create a simple base64 image for a unicode character
-  function createCharacterImage(char: string, size = 16): string {
-    // Create a simple SVG with the character (escape HTML entities)
-    const escapedChar = char
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-      <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-family="Arial, sans-serif" font-size="${size * 0.8}" fill="black">${escapedChar}</text>
-    </svg>`;
+  // Using actual Nookal image data with matching alt text
+  const nookalStyleImages = {
+    diamond: {
+      src: "data:image/gif;base64,R0lGODdhDwAPAPIHAOrs7LzAwenq6////+jq6m12em53erq+wCwAAAAADwAPAAADODi63A4GuAZNnAqece4zm9IJFNgcBZmZTpAqFjbEgza5xGIzeCMUgUXP8QsOJz9DIScbEAzMpiwBADs=",
+      alt: "+jq6m12em53erq+wCwAAAAADwAPAAADODi63A4Gu",
+      char: "◇",
+    },
+    // Let's create more by extracting alt from other Nookal images we've seen
+    symbol1: {
+      src: "data:image/gif;base64,R0lGODdhDwAPAPIHAJCWmc7R0rq/wP///3B5fP7+/lpkaObo6CwAAAAADwAPAAADRDi63F1BiONWIAQATBkkQaEUAtENB2EIjgBYxuoU5qidDBBUjs57tUFBs9ktXAxBjCASlnA0A0aTwSlchYPEusj+vo4EADs=",
+      alt: "lpkaObo6CwAAAAADwAPAAADRDi63F1BiONWIAQAT",
+      char: "•",
+    },
+    symbol2: {
+      src: "data:image/gif;base64,R0lGODdhDwAPAPEAAKCmqO7v8FpkaP///ywAAAAADwAPAAACI5yPqcvtGoAAwQF6nahBeK9ckWQIkESZg6qo7uN+7EPXNlMAADs=",
+      alt: "ywAAAAADwAPAAACI5yPqcvtGoAAwQF6nahBeK9ck",
+      char: "○",
+    },
+    symbol3: {
+      src: "data:image/gif;base64,R0lGODdhCwAPAPEAANjb3KWqrFpkaP///ywAAAAACwAPAAACJZyPqSYtoYQBAiRpAkSYWu5s3OBlXydpBzYEzUI+iydfVgnnSQEAOw==",
+      alt: "ywAAAAACwAPAAACJZyPqSYtoYQBAiRpAkSYWu5s3",
+      char: "±",
+    },
+  };
 
-    // Convert SVG to base64 - handle unicode properly
-    const base64 = btoa(unescape(encodeURIComponent(svg)));
-    return `data:image/svg+xml;base64,${base64}`;
-  }
-
-  // Function to create a more robust PNG-like base64 for characters
-  function createCharacterImageAdvanced(char: string): string {
-    // For now, use a simple approach - in production you'd use Canvas API or similar
-    // This creates a minimal SVG that should render the character
-    const charCode = char.charCodeAt(0).toString(16).padStart(4, "0");
-    const escapedChar = char
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-      <rect width="16" height="16" fill="transparent"/>
-      <text x="8" y="12" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">${escapedChar}</text>
-    </svg>`;
-
-    const base64 = btoa(unescape(encodeURIComponent(svg)));
-    return `data:image/svg+xml;base64,${base64}`;
-  }
-
-  // Function to convert text with unicode to text with images
-  function convertUnicodeToImages(text: string): string {
-    return text.replace(/[^\x00-\x7F]/g, (char) => {
-      const imageData = createCharacterImage(char);
-      const altText = `u${char.charCodeAt(0).toString(16)}`;
-      return `<img src="${imageData}" alt="${altText}" title="${char}" />`;
-    });
-  }
-
-  // Test cases with problematic unicode characters
+  // Test cases using Nookal's exact format
   const testCases = [
     {
-      name: "Accented Characters",
-      original: "Café visit with Dr. José",
-      description: "Convert é to images",
+      name: "Diamond Symbol",
+      original: "Treatment plan ◇ follow-up",
+      withNookalImage: `Treatment plan <img src="${nookalStyleImages.diamond.src}" alt="${nookalStyleImages.diamond.alt}" /> follow-up`,
+      description: "Using exact diamond image from Nookal",
     },
     {
-      name: "Medical Symbols",
-      original: "Temperature: 98.6°F ± 5",
-      description: "Convert degree and plus-minus to images",
+      name: "Bullet Point",
+      original: "Symptoms: • Pain • Swelling",
+      withNookalImage: `Symptoms: <img src="${nookalStyleImages.symbol1.src}" alt="${nookalStyleImages.symbol1.alt}" /> Pain <img src="${nookalStyleImages.symbol1.src}" alt="${nookalStyleImages.symbol1.alt}" /> Swelling`,
+      description: "Using Nookal bullet image",
     },
     {
-      name: "Bullet Points",
-      original: "Treatment:\n• Pain relief\n• Exercise",
-      description: "Convert bullets to images",
+      name: "Plus-Minus Symbol",
+      original: "BP: 120 ± 5 mmHg",
+      withNookalImage: `BP: 120 <img src="${nookalStyleImages.symbol3.src}" alt="${nookalStyleImages.symbol3.alt}" /> 5 mmHg`,
+      description: "Using Nookal plus-minus image",
     },
     {
-      name: "Smart Quotes",
-      original: 'Patient said "I feel better"',
-      description: "Convert smart quotes to images",
+      name: "Control Test - Text Only",
+      original: "No symbols here",
+      withNookalImage: "No symbols here",
+      description: "Control test without images",
     },
     {
-      name: "Complex Medical",
-      original: "François: O₂ 98%, BP: 120±5 mmHg, ♀ patient",
-      description: "Multiple medical symbols and accents",
-    },
-    {
-      name: "Emojis and Unicode",
-      original: "Patient mood: 😊 Pain level: ⭐⭐⭐",
-      description: "Preserve emojis as images",
+      name: "Mixed Symbols",
+      original: "Plan: ◇ Check BP ± 5 • Follow up",
+      withNookalImage: `Plan: <img src="${nookalStyleImages.diamond.src}" alt="${nookalStyleImages.diamond.alt}" /> Check BP <img src="${nookalStyleImages.symbol3.src}" alt="${nookalStyleImages.symbol3.alt}" /> 5 <img src="${nookalStyleImages.symbol1.src}" alt="${nookalStyleImages.symbol1.alt}" /> Follow up`,
+      description: "Multiple Nookal-style symbols",
     },
   ];
 
   try {
     // Get test data
     const patients = await client.getPatients({ page_length: 1 });
-    if (patients.length === 0) {
-      console.error("❌ No patients found.");
-      return;
-    }
-
     const patientId = parseInt(patients[0].ID);
+
+    const cases = await client.getCases({ patientID: patientId.toString() });
+    const caseId = parseInt(cases[0].ID);
+
+    const practitioners = await client.getPractitioners();
+    const practitionerId = parseInt(practitioners[0].ID);
+
     console.log(
       `✅ Using patient: ${patients[0].FirstName} ${patients[0].LastName} (ID: ${patientId})`,
     );
-
-    const cases = await client.getCases({ patientID: patientId.toString() });
-    if (cases.length === 0) {
-      console.error("❌ No cases found.");
-      return;
-    }
-
-    const caseId = parseInt(cases[0].ID);
     console.log(`✅ Using case: ${cases[0].caseTitle} (ID: ${caseId})`);
-
-    const practitioners = await client.getPractitioners();
-    if (practitioners.length === 0) {
-      console.error("❌ No practitioners found.");
-      return;
-    }
-
-    const practitionerId = parseInt(practitioners[0].ID);
     console.log(
       `✅ Using practitioner: ${practitioners[0].FirstName} ${practitioners[0].LastName} (ID: ${practitionerId})\n`,
     );
@@ -132,23 +98,21 @@ async function testUnicodeImages() {
     let partialCount = 0;
     let failCount = 0;
 
-    console.log("🔬 UNICODE-TO-IMAGE CONVERSION TEST RESULTS");
-    console.log("═══════════════════════════════════════════\n");
+    console.log("🔬 NOOKAL-STYLE IMAGE TEST RESULTS");
+    console.log("══════════════════════════════════\n");
 
     for (let i = 0; i < testCases.length; i++) {
       const testCase = testCases[i];
-      const imageVersion = convertUnicodeToImages(testCase.original);
-      const testNote = `[IMG TEST ${i + 1}] ${imageVersion}`;
+      const testNote = `[NOOKAL IMG ${i + 1}] ${testCase.withNookalImage}`;
 
       console.log(`📝 Test ${i + 1}: ${testCase.name}`);
       console.log(`   Description: ${testCase.description}`);
       console.log(`   Original: "${testCase.original}"`);
       console.log(
-        `   With Images: "${imageVersion.substring(0, 100)}${imageVersion.length > 100 ? "..." : ""}"`,
+        `   With Nookal Images: "${testCase.withNookalImage.substring(0, 80)}${testCase.withNookalImage.length > 80 ? "..." : ""}"`,
       );
 
       try {
-        // Add the note with unicode converted to images
         await client.addTreatmentNote({
           patientId,
           caseId,
@@ -158,14 +122,10 @@ async function testUnicodeImages() {
         });
 
         console.log(`   ✅ Note added successfully`);
-
-        // Wait for processing
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        // Get all notes to find our test note
-        const allNotes = await client.getAllTreatmentNotes({ page_length: 50 });
-
-        // Find our note
+        // Get recent notes
+        const allNotes = await client.getAllTreatmentNotes({ page_length: 30 });
         const ourNote = allNotes.find((note) => {
           if (note.answers && Array.isArray(note.answers)) {
             const firstAnswer = note.answers[0];
@@ -176,7 +136,7 @@ async function testUnicodeImages() {
             ) {
               return (
                 firstAnswer.answers[0] &&
-                firstAnswer.answers[0].includes(`[IMG TEST ${i + 1}]`)
+                firstAnswer.answers[0].includes(`[NOOKAL IMG ${i + 1}]`)
               );
             }
           }
@@ -189,48 +149,44 @@ async function testUnicodeImages() {
             `   Retrieved: "${retrievedText.substring(0, 100)}${retrievedText.length > 100 ? "..." : ""}"`,
           );
 
-          // Check if images were preserved
-          if (retrievedText.includes('<img src="data:image/svg+xml;base64,')) {
+          const noteContent = retrievedText.replace(
+            `[NOOKAL IMG ${i + 1}] `,
+            "",
+          );
+
+          // Check if Nookal-style images were preserved
+          if (
+            noteContent.includes('<img src="data:image/gif;base64,') &&
+            noteContent.includes("alt=")
+          ) {
             console.log(
-              `   🎉 EXCELLENT! Images preserved - unicode characters will display correctly!`,
+              `   🎉 EXCELLENT! Nookal-style images preserved perfectly!`,
             );
 
-            // Count how many unicode characters were converted to images
-            const imageCount = (retrievedText.match(/<img[^>]*>/g) || [])
-              .length;
-            const originalUnicodeCount = (
-              testCase.original.match(/[^\x00-\x7F]/g) || []
-            ).length;
-
+            // Count preserved images
+            const imageCount = (noteContent.match(/<img[^>]*>/g) || []).length;
             console.log(
-              `   📊 Converted ${originalUnicodeCount} unicode chars to ${imageCount} images`,
+              `   📊 ${imageCount} image(s) preserved with proper alt text`,
             );
             successCount++;
           }
-          // Check if some images were preserved
+          // Check if images were partially preserved
           else if (
-            retrievedText.includes("<img") ||
-            retrievedText.includes("data:image")
+            noteContent.includes("<img") ||
+            noteContent.includes("data:image")
           ) {
-            console.log(`   ✅ GOOD! Some image conversion detected`);
+            console.log(`   ✅ GOOD! Some image elements detected`);
             partialCount++;
           }
-          // Check for corruption
-          else if (
-            retrievedText.includes("Ã") ||
-            retrievedText.includes("â€") ||
-            retrievedText.includes("Â")
-          ) {
-            console.log(
-              `   ❌ Images were processed but unicode still corrupted`,
-            );
-            console.log(
-              `   🔍 This suggests Nookal corrupted the unicode BEFORE image processing`,
-            );
-            failCount++;
+          // Check if content matches exactly (for text-only test)
+          else if (noteContent === testCase.withNookalImage) {
+            console.log(`   ✅ PERFECT! Text content preserved exactly`);
+            successCount++;
           } else {
-            console.log(`   🤔 Images processed but result unclear`);
-            partialCount++;
+            console.log(`   ❌ Content was modified or corrupted`);
+            console.log(`   Expected: "${testCase.withNookalImage}"`);
+            console.log(`   Got: "${noteContent}"`);
+            failCount++;
           }
         } else {
           console.log(`   ❌ Note not found after adding`);
@@ -247,13 +203,13 @@ async function testUnicodeImages() {
     }
 
     // Summary
-    console.log("📊 UNICODE-TO-IMAGE TEST SUMMARY");
-    console.log("═════════════════════════════════");
+    console.log("📊 NOOKAL-STYLE IMAGE TEST SUMMARY");
+    console.log("══════════════════════════════════");
     console.log(
-      `🎉 Perfect (images preserved): ${successCount}/${testCases.length}`,
+      `🎉 Perfect (images work): ${successCount}/${testCases.length}`,
     );
     console.log(
-      `✅ Partial (some images work): ${partialCount}/${testCases.length}`,
+      `✅ Partial (some success): ${partialCount}/${testCases.length}`,
     );
     console.log(`❌ Failed: ${failCount}/${testCases.length}`);
     const totalSuccess = successCount + partialCount;
@@ -262,52 +218,53 @@ async function testUnicodeImages() {
     );
 
     if (successCount === testCases.length) {
-      console.log(
-        "🎉 PERFECT! Unicode-to-image conversion completely preserves appearance!",
-      );
-      console.log("🛠️  Recommended implementation:");
-      console.log("   1. Detect unicode characters in text");
-      console.log("   2. Convert each to base64 SVG image");
-      console.log("   3. Replace in text with <img> tags");
-      console.log("   4. Send to Nookal - images bypass unicode corruption!");
+      console.log("🎉 BREAKTHROUGH! Nookal-style images work perfectly!");
+      console.log("🛠️  Key Discovery: Alt text must match base64 substring");
+      console.log("💡 Implementation Strategy:");
+      console.log("   1. Use Nookal's existing image library");
+      console.log("   2. Match alt text to base64 substring pattern");
+      console.log("   3. Create mapping of unicode → Nookal images");
+      console.log("   4. Fallback to text substitution for unmapped chars");
 
       console.log("\n💻 Production Implementation:");
-      console.log("   function convertUnicodeToImages(text: string): string {");
-      console.log("     return text.replace(/[^\\x00-\\x7F]/g, (char) => {");
-      console.log("       const svg = createCharacterSVG(char);");
-      console.log("       const base64 = btoa(svg);");
+      console.log("   const nookalImageMap = {");
       console.log(
-        '       return `<img src="data:image/svg+xml;base64,${base64}" alt="${char}" />`;',
+        "     '◇': { src: 'data:image/gif;base64,...', alt: '...' },",
       );
-      console.log("     });");
-      console.log("   }");
+      console.log(
+        "     '•': { src: 'data:image/gif;base64,...', alt: '...' },",
+      );
+      console.log("     '±': { src: 'data:image/gif;base64,...', alt: '...' }");
+      console.log("   };");
     } else if (totalSuccess > failCount) {
-      console.log(
-        "✅ PROMISING! Image conversion works for most unicode characters",
-      );
-      console.log("🛠️  Refine the approach for characters that failed");
+      console.log("✅ PROMISING! Some Nookal-style images work");
+      console.log("🔍 Next: Analyze which alt text patterns succeed");
+      console.log("💡 Refine the alt text generation algorithm");
     } else if (totalSuccess > 0) {
-      console.log("🤔 MIXED RESULTS: Some unicode-to-image conversion works");
-      console.log("🛠️  Use images for characters that work, substitute others");
+      console.log("🤔 MIXED RESULTS: Partial success with Nookal images");
+      console.log("🔍 The alt text pattern might need fine-tuning");
     } else {
+      console.log("😞 Nookal-style images still blocked");
+      console.log("🔍 Security restrictions may be tighter than expected");
       console.log(
-        "😞 IMAGE APPROACH FAILED: Nookal doesn't handle our generated images",
+        "💡 Consider requesting Nookal's official image API documentation",
       );
-      console.log("🛠️  May need to match Nookal's exact image format");
     }
 
-    // Provide detailed recommendations
-    console.log("\n💡 NEXT STEPS:");
-    if (successCount > 0) {
-      console.log("   • Implement unicode-to-image conversion utility");
-      console.log("   • Create image cache for common characters");
-      console.log("   • Add fallback for unsupported characters");
-      console.log("   • Test with real-world medical notes");
-    } else {
-      console.log("   • Analyze Nookal's existing symbol images");
-      console.log("   • Match their exact image format/encoding");
-      console.log("   • Consider hybrid approach: images + substitution");
-    }
+    // Analysis of alt text patterns
+    console.log("\n🔍 ALT TEXT PATTERN ANALYSIS:");
+    console.log("════════════════════════════");
+    Object.entries(nookalStyleImages).forEach(([key, img]) => {
+      const base64Data = img.src.split(",")[1];
+      const altInBase64 = base64Data.includes(img.alt.replace(/[+]/g, ""));
+      console.log(
+        `${key}: Alt text found in base64: ${altInBase64 ? "✅" : "❌"}`,
+      );
+      console.log(`   Alt: "${img.alt}"`);
+      console.log(
+        `   Base64 length: ${base64Data.length}, Alt length: ${img.alt.length}`,
+      );
+    });
   } catch (error) {
     console.error("❌ Test failed:", error);
   }
@@ -315,7 +272,7 @@ async function testUnicodeImages() {
 
 // Run the test if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  testUnicodeImages().catch(console.error);
+  testNookalStyleImages().catch(console.error);
 }
 
-export { testUnicodeImages };
+export { testNookalStyleImages };

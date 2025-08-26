@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { NookalClient } from "./nookal-client.js";
+import { NookalClient } from "./nookal-client";
 import type {
   NookalApiResponse,
   Patient,
@@ -448,7 +448,7 @@ describe("createNookalClientFromEnv", () => {
 
   it("should create client from environment variables", async () => {
     // Dynamic import to avoid issues with top-level mocking
-    const { createNookalClientFromEnv } = await import("./nookal-client.js");
+    const { createNookalClientFromEnv } = await import("./nookal-client");
 
     process.env.NOOKAL_API_KEY = "env-api-key";
     process.env.NOOKAL_BASE_URL = "https://api.nookal.com/env/v2";
@@ -458,7 +458,7 @@ describe("createNookalClientFromEnv", () => {
   });
 
   it("should use default base URL when not provided", async () => {
-    const { createNookalClientFromEnv } = await import("./nookal-client.js");
+    const { createNookalClientFromEnv } = await import("./nookal-client");
 
     process.env.NOOKAL_API_KEY = "env-api-key";
     delete process.env.NOOKAL_BASE_URL;
@@ -468,7 +468,7 @@ describe("createNookalClientFromEnv", () => {
   });
 
   it("should throw error when API key is missing", async () => {
-    const { createNookalClientFromEnv } = await import("./nookal-client.js");
+    const { createNookalClientFromEnv } = await import("./nookal-client");
 
     delete process.env.NOOKAL_API_KEY;
 

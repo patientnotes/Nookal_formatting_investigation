@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 
-import { createNookalClientFromEnv } from "./nookal-client.js";
-import {
-  loadEnvFile,
-  prettyPrint,
-  formatDate,
-  formatDateTime,
-} from "./utils.js";
+import { createNookalClientFromEnv } from "./nookal-client";
+import { loadEnvFile, prettyPrint, formatDate, formatDateTime } from "./utils";
 import { testUnicodeNotes } from "./test-unicode-notes.js";
 import * as readline from "readline";
 

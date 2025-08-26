@@ -11,7 +11,7 @@ This repository contains a comprehensive investigation into unicode character co
 When submitting treatment notes containing unicode characters (accented letters, medical symbols, smart quotes, etc.) through the Nookal API, the characters become corrupted in predictable patterns:
 
 - `café` becomes `CafÃ©`
-- `45°F` becomes `45Â°F` 
+- `45°F` becomes `45Â°F`
 - `±5 mmHg` becomes `Â±5 mmHg`
 - `• bullet` becomes `â€¢ bullet`
 - `"smart quotes"` become `â€œsmart quotesâ€`
@@ -129,13 +129,13 @@ CURLOPT_HTTPHEADER => array(
 ```
 📊 UNICODE TEST SUMMARY
 ✅ Successful: 0/10
-❌ Failed: 10/10  
+❌ Failed: 10/10
 📈 Success Rate: 0%
 ```
 
 ### Security Restriction Evidence
 - **Latin-1 headers**: 0% success rate (notes silently rejected)
-- **UTF-16 headers**: 0% success rate (notes silently rejected)  
+- **UTF-16 headers**: 0% success rate (notes silently rejected)
 - **Image data URLs**: 0% success rate (notes silently rejected)
 
 ## Recommended Solutions
@@ -166,16 +166,16 @@ Since the core issue requires server-side fixes, the only viable workaround is *
 const unicodeSubstitutions = {
   // Medical symbols → readable text
   '°': 'deg',
-  '±': '+/-', 
+  '±': '+/-',
   '•': '* ',
   '–': '-',
   '—': '--',
-  
+
   // Accented characters → ASCII equivalents
   'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
   'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a',
   'ç': 'c', 'ñ': 'n', 'ü': 'u', 'ö': 'o',
-  
+
   // Keep smart quotes fix from headers
   // '"' and '"' work with UTF-8 headers
 };
@@ -194,13 +194,12 @@ cp .env.example .env
 ```bash
 # Run individual test suites
 npm run test:unicode          # Basic unicode corruption test
-npm run test:headers          # UTF-8 header fix test  
+npm run test:headers          # UTF-8 header fix test
 npm run test:entities         # HTML entity encoding test
 npm run test:reverse          # Reverse encoding test
 npm run test:latin1           # Latin-1 header test
 npm run test:utf16            # UTF-16 encoding test
 npm run test:images           # Unicode-to-image conversion test
-npm run test:nookal-images    # Nookal-style image test
 
 # Interactive CLI with all test options
 npm run cli
@@ -212,7 +211,7 @@ The test suite provides detailed analysis:
 🧪 Testing UTF-8 Header Fix for Unicode Corruption
 
 ✅ Using patient: John Doe (ID: 1)
-✅ Using case: General (ID: 1) 
+✅ Using case: General (ID: 1)
 ✅ Using practitioner: Nigel Thorne (ID: 1)
 
 📝 Test 1: Smart Quotes
@@ -221,7 +220,7 @@ The test suite provides detailed analysis:
    Retrieved: "[HEADER TEST 1] Patient said "I feel better" today."
    ✅ PERFECT MATCH! Unicode preserved correctly
 
-📝 Test 2: Accented Characters  
+📝 Test 2: Accented Characters
    Input: "Visit to café with Dr. José was naïve but helpful."
    ✅ Note added successfully
    Retrieved: "[HEADER TEST 2] Visit to cafÃ© with Dr. JosÃ© was naÃ¯ve but helpful."
@@ -234,13 +233,12 @@ The test suite provides detailed analysis:
 ```
 src/
 ├── test-unicode-notes.ts           # Comprehensive unicode corruption test
-├── test-header-fix.ts              # UTF-8 charset header test  
+├── test-header-fix.ts              # UTF-8 charset header test
 ├── test-unicode-entities.ts        # HTML entity encoding test
 ├── test-reverse-encoding.ts        # Reverse encoding strategy test
 ├── test-reverse-encoding-headers.ts # Latin-1 header test
 ├── test-utf16-encoding.ts          # UTF-16 encoding test
 ├── test-unicode-images.ts          # Unicode-to-image conversion test
-├── test-nookal-style-images.ts     # Nookal-compatible image test
 ├── test-simple-images.ts           # Minimal image test
 ├── simple-unicode-test.ts          # Single-character debug test
 ├── check-recent-notes.ts           # Note verification utility
