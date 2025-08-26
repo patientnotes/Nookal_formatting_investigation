@@ -1,0 +1,42 @@
+{
+  "name": "nookal-api-client",
+  "version": "1.0.0",
+  "description": "TypeScript client for querying the Nookal API",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "cli": "tsx src/cli.ts",
+    "test": "vitest",
+    "test:unicode": "tsx src/test-unicode-notes.ts",
+    "test:headers": "tsx src/test-header-fix.ts",
+    "test:entities": "tsx src/test-unicode-entities.ts",
+    "test:reverse": "tsx src/test-reverse-encoding.ts",
+    "test:latin1": "tsx src/test-reverse-encoding-headers.ts",
+    "test:utf16": "tsx src/test-utf16-encoding.ts",
+    "test:images": "tsx src/test-unicode-images.ts",
+    "test:php-sdk": "tsx src/test-php-sdk-mimicry.ts",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --apply"
+  },
+  "keywords": [
+    "nookal",
+    "api",
+    "client",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
