@@ -162,6 +162,9 @@ CURLOPT_HTTPHEADER => array(
 
 Since the core issue requires server-side fixes, the only viable workaround is **intelligent character substitution**:
 
+The problem with this is, practitioners want the notes to appear verbatum. Not a converted version.
+
+
 ```typescript
 const unicodeSubstitutions = {
   // Medical symbols → readable text
@@ -267,4 +270,4 @@ This investigation was conducted to help improve unicode support in the Nookal A
 
 ---
 
-**SDK Reference**: This investigation included analysis of Nookal's official PHP SDK v0.1.14 (located in `ref/` directory), which confirmed that the unicode encoding issue affects all client implementations regardless of programming language.
+**SDK Reference**: This investigation included analysis of Nookal's official PHP SDK v0.1.14, which confirmed that the unicode encoding issue affects all client implementations regardless of programming language.
